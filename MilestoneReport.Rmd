@@ -1,0 +1,61 @@
+---
+title: "Capstone: Milestone Report"
+output: html_document
+---
+**March 15, 2016**
+
+```{r, echo=FALSE}
+## Securing the Data
+setwd("~/GitHub/Capstone")
+```
+
+## Overview
+This is the milestone report for the Data Science Capstone Project.
+
+The goal of this report was to build a simple model for the relationship between words, as a first step in creating a predictive text mining application. 
+
+The following sections describe my methods for analysing the datasets
+
+## Libraries
+
+Load the necessary libraries and set the seed
+
+```{r libraries, warning=FALSE, message=FALSE}
+library(tm)
+#library(RCurl)
+#library(caret)
+#library(randomForest)
+
+#set.seed(3510)
+```
+
+## Securing the Data and Preliminary Analyses
+
+The dataset can be downloaded from here
+
+* https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip
+
+Included are three different data files containing text sampled from blogs, news articles, and twitter feeds. I used the the English versions.
+
+```{r load, cache=TRUE, warning=FALSE}
+## Load files
+file_blogs   = "data/final/en_US/en_US.blogs.txt"
+file_news    = "data/final/en_US/en_US.news.txt"
+file_twitter = "data/final/en_US/en_US.twitter.txt"
+
+# Read the files
+blog    <- readLines(file_blogs)
+news    <- readLines(file_news)
+twitter <- readLines(file_twitter)
+```
+
+
+```{r}
+length(twitter)
+```
+
+
+move to n-gram model
+
+end with word cloud for fun
+
