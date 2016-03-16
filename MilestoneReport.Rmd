@@ -18,15 +18,11 @@ The following sections describe my methods for analysing the datasets
 
 ## Libraries
 
-Load the necessary libraries and set the seed
+Load the necessary libraries
 
 ```{r libraries, warning=FALSE, message=FALSE}
 library(tm)
-#library(RCurl)
-#library(caret)
-#library(randomForest)
-
-#set.seed(3510)
+library(knitr)
 ```
 
 ## Securing the Data and Preliminary Analyses
@@ -38,20 +34,56 @@ The dataset can be downloaded from here
 Included are three different data files containing text sampled from blogs, news articles, and twitter feeds. I used the the English versions.
 
 ```{r load, cache=TRUE, warning=FALSE}
-## Load files
-file_blogs   = "data/final/en_US/en_US.blogs.txt"
-file_news    = "data/final/en_US/en_US.news.txt"
-file_twitter = "data/final/en_US/en_US.twitter.txt"
-
-# Read the files
-blog    <- readLines(file_blogs)
-news    <- readLines(file_news)
-twitter <- readLines(file_twitter)
+## Read in the files
+blog    <- readLines("data/final/en_US/en_US.blogs.txt")
+news    <- readLines("data/final/en_US/en_US.news.txt")
+twitter <- readLines("data/final/en_US/en_US.twitter.txt")
 ```
 
+The datasets are fairly large with several million lines of text.
 
-```{r}
-length(twitter)
+```{r stats}
+kable(data.frame(
+  "Data File"       = c("Blogs", "News", "Twitter"), 
+  "Line Count"      = c(length(blog), length(news), length(twitter)),
+  "Character Count" = c( sum(nchar(blog)), sum(nchar(news)), sum(nchar(twitter)))
+  ))
+```
+
+## Clean and sample the data sets
+
+We need to clean the data sets of any characters that will impede our ability to predict the next word. Such as numbers, punctuation and special characters. 
+
+The next sections will be using the tm package, you can find a good introduction here
+* https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf
+
+Samples of the data sets are used to reduce the memory footprint.
+
+```{r sample, cache=TRUE, warning=FALSE}
+set.seed(90210)
+
+s_blog   <- sample(blog, size = 10000, replace = TRUE)
+s_news   <- sample(news, size = 10000, replace = TRUE)
+s_twiter <- sample(twitter, size = 10000, replace = TRUE)
+
+swiftkey = Corpus(VectorSource(c(s_blog, s_news, s_twiter)))
+```
+
+Tidy up the data sets by removing elements and converting to a common case.
+
+```{r tidy, cache=TRUE}
+swiftkey <- tm_map(swiftkey, content_transformer(tolower))
+
+# remove the most commonly used words in the english language
+swiftkey <- tm_map(swiftkey, removeWords, stopwords("english"))
+
+# reduce inflected (or sometimes derived) words to their word stem
+swiftkey <- tm_map(swiftkey, stemDocument)
+
+# clean up
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeNumbers)
 ```
 
 

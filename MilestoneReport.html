@@ -75,11 +75,9 @@ img {
 <h2>Libraries</h2>
 <p>Load the necessary libraries and set the seed</p>
 <pre class="r"><code>library(tm)
-#library(RCurl)
-#library(caret)
-#library(randomForest)
-
-#set.seed(3510)</code></pre>
+library(knitr)
+#
+set.seed(90210)</code></pre>
 </div>
 <div id="securing-the-data-and-preliminary-analyses" class="section level2">
 <h2>Securing the Data and Preliminary Analyses</h2>
@@ -87,18 +85,46 @@ img {
 <ul>
 <li><a href="https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip" class="uri">https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip</a></li>
 </ul>
-<p>Included are three different data files containing text sampled from blogs, news articles, and twitter feeds.</p>
-<pre class="r"><code>## Load files
-file_blogs   = &quot;data/final/en_US/en_US.blogs.txt&quot;
-file_news    = &quot;data/final/en_US/en_US.news.txt&quot;
-file_twitter = &quot;data/final/en_US/en_US.twitter.txt&quot;
-
-# Read the files
-blog    &lt;- readLines(file_blogs)
-news    &lt;- readLines(file_news)
-twitter &lt;- readLines(file_twitter)</code></pre>
-<pre class="r"><code>length(twitter)</code></pre>
-<pre><code>## [1] 2360148</code></pre>
+<p>Included are three different data files containing text sampled from blogs, news articles, and twitter feeds. I used the the English versions.</p>
+<pre class="r"><code>## Read in the files
+blog    &lt;- readLines(&quot;data/final/en_US/en_US.blogs.txt&quot;)
+news    &lt;- readLines(&quot;data/final/en_US/en_US.news.txt&quot;)
+twitter &lt;- readLines(&quot;data/final/en_US/en_US.twitter.txt&quot;)</code></pre>
+<p>Basically the</p>
+<pre class="r"><code>kable(data.frame(
+  &quot;Data File&quot;       = c(&quot;Blogs&quot;, &quot;News&quot;, &quot;Twitter&quot;), 
+  &quot;Line Count&quot;      = c(length(blog), length(news), length(twitter)),
+  &quot;Character Count&quot; = c( sum(nchar(blog)), sum(nchar(news)), sum(nchar(twitter)))
+  ))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Data.File</th>
+<th align="right">Line.Count</th>
+<th align="right">Character.Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Blogs</td>
+<td align="right">899288</td>
+<td align="right">208361438</td>
+</tr>
+<tr class="even">
+<td align="left">News</td>
+<td align="right">77259</td>
+<td align="right">15683765</td>
+</tr>
+<tr class="odd">
+<td align="left">Twitter</td>
+<td align="right">2360148</td>
+<td align="right">162384825</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="clean-the-data-sets" class="section level2">
+<h2>Clean the data sets</h2>
 <p>move to n-gram model</p>
 <p>end with word cloud for fun</p>
 </div>
