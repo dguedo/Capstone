@@ -23,7 +23,6 @@ Load the necessary libraries
 ```{r libraries, warning=FALSE, message=FALSE}
 library(tm)
 library(knitr)
-library(RWeka)
 ```
 
 ## Securing the Data and Preliminary Analyses
@@ -64,7 +63,7 @@ Samples of the data sets are used to reduce the memory footprint.
 set.seed(90210)
 
 combined_set <- c(blog, news, twitter)
-sample_set   <- sample(combined_set, size = 3000, replace = TRUE)
+sample_set   <- sample(combined_set, size = 10000, replace = TRUE)
 
 # encode
 sample_set <- iconv(sample_set, "latin1", "ASCII", "") 
@@ -112,24 +111,27 @@ tdm1 <- TermDocumentMatrix(swiftkey, control = list(tokenize = unigram))
 tdm2 <- TermDocumentMatrix(swiftkey, control = list(tokenize = bigram))
 tdm3 <- TermDocumentMatrix(swiftkey, control = list(tokenize = trigram))
 
+inspect(tdm2[202:205, 1:5])
 
-findFreqTerms(tdm1, lowfreq = 90)[1:25]
+tt <- findFreqTerms(tdm1, lowfreq = 90)[1:25]
 findFreqTerms(tdm2, lowfreq = 7)[1:25]
 findFreqTerms(tdm3, lowfreq = 2)[1:25]
 
-#inspect(removeSparseTerms(tdm[, 1:10], 0.7))
 
-#findFreqTerms(ff, lowfreq=100)
-#findFreqTerms(ngram, lowfreq = 6)[1:25]
+freq1 <- sort(rowSums(as.matrix(tdm1)), decreasing = TRUE)[1:25]
+freq2 <- sort(rowSums(as.matrix(tdm2)), decreasing = TRUE)[1:25]
+freq3 <- sort(rowSums(as.matrix(tdm3)), decreasing = TRUE)[1:25]
+freq1
+tt
 
-#ft <- findFreqTerms(tdm, lowfreq = 6)[1:25]
+#findAssocs(tdm1, "will", 0.5)
+#findFreqTerms(tdm1, 200)
 
-#findFreqTerms(ff, lowfreq=100)
-#findFreqTerms(uni, lowfreq = 100)[1:25]
-###
-#findFreqTerms(tdm, lowfreq = 6)[1:25]
-###
-#findFreqTerms(tr, lowfreq = 3)[1:25]
+tdm1
+
+tdm = removeSparseTerms(tdm1, 0.2)
+
+tdm
 
 ```
 
