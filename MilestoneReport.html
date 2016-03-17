@@ -128,11 +128,18 @@ twitter &lt;- readLines(&quot;data/final/en_US/en_US.twitter.txt&quot;)</code></
 <p>Samples of the data sets are used to reduce the memory footprint.</p>
 <pre class="r"><code>set.seed(90210)
 
-s_blog   &lt;- sample(blog, size = 10000, replace = TRUE)
-s_news   &lt;- sample(news, size = 10000, replace = TRUE)
-s_twiter &lt;- sample(twitter, size = 10000, replace = TRUE)
+combined_set &lt;- c(blog, news, twitter)
+sample_set   &lt;- sample(combined_set, size = 3000, replace = TRUE)
 
-swiftkey = Corpus(VectorSource(c(s_blog, s_news, s_twiter)))</code></pre>
+# encode
+Encoding(sample_set) &lt;- &quot;latin1&quot;
+combined &lt;- iconv(sample_set, &quot;latin1&quot;, &quot;ASCII&quot;, &quot;&quot;) 
+
+# create the corpus
+swiftkey = Corpus(VectorSource(sample_set))
+
+# clean up objects
+rm(blog, news, twitter, sample_set)</code></pre>
 <p>Tidy up the data sets by removing elements and converting to a common case.</p>
 <pre class="r"><code>swiftkey &lt;- tm_map(swiftkey, content_transformer(tolower))
 
@@ -146,8 +153,17 @@ swiftkey &lt;- tm_map(swiftkey, stemDocument)
 swiftkey &lt;- tm_map(swiftkey, stripWhitespace)
 swiftkey &lt;- tm_map(swiftkey, removePunctuation)
 swiftkey &lt;- tm_map(swiftkey, removeNumbers)</code></pre>
-<p>move to n-gram model</p>
-<p>end with word cloud for fun</p>
+</div>
+<div id="basic-n-gram-models" class="section level2">
+<h2>Basic n-gram models</h2>
+<pre class="r"><code>ff &lt;- TermDocumentMatrix(swiftkey)
+findFreqTerms(ff, lowfreq=100)</code></pre>
+<pre><code>##  [1] &quot;back&quot;  &quot;can&quot;   &quot;come&quot;  &quot;day&quot;   &quot;get&quot;   &quot;good&quot;  &quot;just&quot;  &quot;know&quot; 
+##  [9] &quot;like&quot;  &quot;look&quot;  &quot;love&quot;  &quot;make&quot;  &quot;need&quot;  &quot;new&quot;   &quot;now&quot;   &quot;one&quot;  
+## [17] &quot;see&quot;   &quot;thank&quot; &quot;think&quot; &quot;time&quot;  &quot;want&quot;  &quot;will&quot;</code></pre>
+</div>
+<div id="end-with-word-cloud-for-fun" class="section level2">
+<h2>end with word cloud for fun</h2>
 </div>
 
 

@@ -1,4 +1,4 @@
---
+---
 title: "Capstone: Milestone Report"
 output: html_document
 ---
@@ -23,6 +23,7 @@ Load the necessary libraries
 ```{r libraries, warning=FALSE, message=FALSE}
 library(tm)
 library(knitr)
+library(RWeka)
 ```
 
 ## Securing the Data and Preliminary Analyses
@@ -59,23 +60,20 @@ The next sections uses the tm package, you can find an introduction here
 
 Samples of the data sets are used to reduce the memory footprint.
 
-```{r sample, cache=TRUE, warning=FALSE}
+```{r sample, warning=FALSE}
 set.seed(90210)
 
-s_blog   <- sample(blog, size = 1000, replace = TRUE)
-s_news   <- sample(news, size = 1000, replace = TRUE)
-s_twiter <- sample(twitter, size = 1000, replace = TRUE)
+combined_set <- c(blog, news, twitter)
+sample_set   <- sample(combined_set, size = 3000, replace = TRUE)
 
-# combine and encode
-combined <- c(s_blog, s_news, s_twiter)
-Encoding(combined) <- "latin1"
-combined <- iconv(combined, "latin1", "ASCII", "") 
+# encode
+sample_set <- iconv(sample_set, "latin1", "ASCII", "") 
 
 # create the corpus
-swiftkey = Corpus(VectorSource(combined))
+swiftkey = Corpus(VectorSource(sample_set))
 
 # clean up objects
-rm(blog, news, twitter, s_blog, s_news, s_twiter, combined)
+rm(blog, news, twitter, sample_set)
 ```
 
 Tidy up the data sets by removing elements and converting to a common case.
@@ -98,8 +96,41 @@ swiftkey <- tm_map(swiftkey, removeNumbers)
 ## Basic n-gram models
 
 ```{r}
+###################
+## http://tm.r-forge.r-project.org/faq.html
+# https://www.jstatsoft.org/article/view/v025i05
+
 ff <- TermDocumentMatrix(swiftkey)
 findFreqTerms(ff, lowfreq=100)
+
+
+unigram <- function(x) unlist(lapply(ngrams(words(x), 1), paste, collapse = " "), use.names = FALSE)
+bigram  <- function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
+trigram <- function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
+
+tdm1 <- TermDocumentMatrix(swiftkey, control = list(tokenize = unigram))
+tdm2 <- TermDocumentMatrix(swiftkey, control = list(tokenize = bigram))
+tdm3 <- TermDocumentMatrix(swiftkey, control = list(tokenize = trigram))
+
+
+findFreqTerms(tdm1, lowfreq = 90)[1:25]
+findFreqTerms(tdm2, lowfreq = 7)[1:25]
+findFreqTerms(tdm3, lowfreq = 2)[1:25]
+
+#inspect(removeSparseTerms(tdm[, 1:10], 0.7))
+
+#findFreqTerms(ff, lowfreq=100)
+#findFreqTerms(ngram, lowfreq = 6)[1:25]
+
+#ft <- findFreqTerms(tdm, lowfreq = 6)[1:25]
+
+#findFreqTerms(ff, lowfreq=100)
+#findFreqTerms(uni, lowfreq = 100)[1:25]
+###
+#findFreqTerms(tdm, lowfreq = 6)[1:25]
+###
+#findFreqTerms(tr, lowfreq = 3)[1:25]
+
 ```
 
 
