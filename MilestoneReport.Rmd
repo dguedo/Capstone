@@ -1,4 +1,4 @@
----
+--
 title: "Capstone: Milestone Report"
 output: html_document
 ---
@@ -31,7 +31,7 @@ The dataset can be downloaded from here
 
 * https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip
 
-Included are three different data files containing text sampled from blogs, news articles, and twitter feeds. I used the the English versions.
+Included are three different data files containing text sampled from blogs, news articles, and twitter feeds. The the English versions was used.
 
 ```{r load, cache=TRUE, warning=FALSE}
 ## Read in the files
@@ -40,7 +40,7 @@ news    <- readLines("data/final/en_US/en_US.news.txt")
 twitter <- readLines("data/final/en_US/en_US.twitter.txt")
 ```
 
-The datasets are fairly large with several million lines of text.
+Combined the datasets contain several million lines of text, with over 20 million characters.
 
 ```{r stats}
 kable(data.frame(
@@ -52,9 +52,9 @@ kable(data.frame(
 
 ## Clean and sample the data sets
 
-We need to clean the data sets of any characters that will impede our ability to predict the next word. Such as numbers, punctuation and special characters. 
+In order to be able to predict the next word with the highest degree of accuracy, in a reasonably efficient manner, the data set needed to be cleaned up. Numbers, punctuation, special characters, and stop words were removed.  In addition, words where converted back to their stems. 
 
-The next sections will be using the tm package, you can find a good introduction here
+The next sections uses the tm package, you can find an introduction here
 * https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf
 
 Samples of the data sets are used to reduce the memory footprint.
@@ -62,11 +62,20 @@ Samples of the data sets are used to reduce the memory footprint.
 ```{r sample, cache=TRUE, warning=FALSE}
 set.seed(90210)
 
-s_blog   <- sample(blog, size = 10000, replace = TRUE)
-s_news   <- sample(news, size = 10000, replace = TRUE)
-s_twiter <- sample(twitter, size = 10000, replace = TRUE)
+s_blog   <- sample(blog, size = 1000, replace = TRUE)
+s_news   <- sample(news, size = 1000, replace = TRUE)
+s_twiter <- sample(twitter, size = 1000, replace = TRUE)
 
-swiftkey = Corpus(VectorSource(c(s_blog, s_news, s_twiter)))
+# combine and encode
+combined <- c(s_blog, s_news, s_twiter)
+Encoding(combined) <- "latin1"
+combined <- iconv(combined, "latin1", "ASCII", "") 
+
+# create the corpus
+swiftkey = Corpus(VectorSource(combined))
+
+# clean up objects
+rm(blog, news, twitter, s_blog, s_news, s_twiter, combined)
 ```
 
 Tidy up the data sets by removing elements and converting to a common case.
@@ -81,13 +90,18 @@ swiftkey <- tm_map(swiftkey, removeWords, stopwords("english"))
 swiftkey <- tm_map(swiftkey, stemDocument)
 
 # clean up
-corpus <- tm_map(corpus, stripWhitespace)
-corpus <- tm_map(corpus, removePunctuation)
-corpus <- tm_map(corpus, removeNumbers)
+swiftkey <- tm_map(swiftkey, stripWhitespace)
+swiftkey <- tm_map(swiftkey, removePunctuation)
+swiftkey <- tm_map(swiftkey, removeNumbers)
+```
+
+## Basic n-gram models
+
+```{r}
+ff <- TermDocumentMatrix(swiftkey)
+findFreqTerms(ff, lowfreq=100)
 ```
 
 
-move to n-gram model
-
-end with word cloud for fun
+## end with word cloud for fun
 

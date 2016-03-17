@@ -73,11 +73,9 @@ img {
 </div>
 <div id="libraries" class="section level2">
 <h2>Libraries</h2>
-<p>Load the necessary libraries and set the seed</p>
+<p>Load the necessary libraries</p>
 <pre class="r"><code>library(tm)
-library(knitr)
-#
-set.seed(90210)</code></pre>
+library(knitr)</code></pre>
 </div>
 <div id="securing-the-data-and-preliminary-analyses" class="section level2">
 <h2>Securing the Data and Preliminary Analyses</h2>
@@ -85,12 +83,12 @@ set.seed(90210)</code></pre>
 <ul>
 <li><a href="https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip" class="uri">https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip</a></li>
 </ul>
-<p>Included are three different data files containing text sampled from blogs, news articles, and twitter feeds. I used the the English versions.</p>
+<p>Included are three different data files containing text sampled from blogs, news articles, and twitter feeds. The the English versions was used.</p>
 <pre class="r"><code>## Read in the files
 blog    &lt;- readLines(&quot;data/final/en_US/en_US.blogs.txt&quot;)
 news    &lt;- readLines(&quot;data/final/en_US/en_US.news.txt&quot;)
 twitter &lt;- readLines(&quot;data/final/en_US/en_US.twitter.txt&quot;)</code></pre>
-<p>Basically the</p>
+<p>Combined the datasets contain several million lines of text, with over 20 million characters.</p>
 <pre class="r"><code>kable(data.frame(
   &quot;Data File&quot;       = c(&quot;Blogs&quot;, &quot;News&quot;, &quot;Twitter&quot;), 
   &quot;Line Count&quot;      = c(length(blog), length(news), length(twitter)),
@@ -123,8 +121,31 @@ twitter &lt;- readLines(&quot;data/final/en_US/en_US.twitter.txt&quot;)</code></
 </tbody>
 </table>
 </div>
-<div id="clean-the-data-sets" class="section level2">
-<h2>Clean the data sets</h2>
+<div id="clean-and-sample-the-data-sets" class="section level2">
+<h2>Clean and sample the data sets</h2>
+<p>In order to be able to predict the next word with the highest degree of accuracy, in a reasonably efficient manner, the data set needed to be cleaned up. Numbers, punctuation, special characters, and stop words were removed. In addition, words where converted back to their stems.</p>
+<p>The next sections uses the tm package, you can find an introduction here * <a href="https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf" class="uri">https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf</a></p>
+<p>Samples of the data sets are used to reduce the memory footprint.</p>
+<pre class="r"><code>set.seed(90210)
+
+s_blog   &lt;- sample(blog, size = 10000, replace = TRUE)
+s_news   &lt;- sample(news, size = 10000, replace = TRUE)
+s_twiter &lt;- sample(twitter, size = 10000, replace = TRUE)
+
+swiftkey = Corpus(VectorSource(c(s_blog, s_news, s_twiter)))</code></pre>
+<p>Tidy up the data sets by removing elements and converting to a common case.</p>
+<pre class="r"><code>swiftkey &lt;- tm_map(swiftkey, content_transformer(tolower))
+
+# remove the most commonly used words in the english language
+swiftkey &lt;- tm_map(swiftkey, removeWords, stopwords(&quot;english&quot;))
+
+# reduce inflected (or sometimes derived) words to their word stem
+swiftkey &lt;- tm_map(swiftkey, stemDocument)
+
+# clean up
+swiftkey &lt;- tm_map(swiftkey, stripWhitespace)
+swiftkey &lt;- tm_map(swiftkey, removePunctuation)
+swiftkey &lt;- tm_map(swiftkey, removeNumbers)</code></pre>
 <p>move to n-gram model</p>
 <p>end with word cloud for fun</p>
 </div>
