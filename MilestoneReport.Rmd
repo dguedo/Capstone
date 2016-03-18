@@ -23,6 +23,7 @@ Load the necessary libraries
 ```{r libraries, warning=FALSE, message=FALSE}
 library(tm)
 library(knitr)
+library(ggplot2)
 ```
 
 ## Securing the Data and Preliminary Analyses
@@ -55,6 +56,7 @@ kable(data.frame(
 In order to be able to predict the next word with the highest degree of accuracy, in a reasonably efficient manner, the data set needed to be cleaned up. Numbers, punctuation, special characters, and stop words were removed.  In addition, words where converted back to their stems. 
 
 The next sections uses the tm package, you can find an introduction here
+
 * https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf
 
 Samples of the data sets are used to reduce the memory footprint.
@@ -63,7 +65,7 @@ Samples of the data sets are used to reduce the memory footprint.
 set.seed(90210)
 
 combined_set <- c(blog, news, twitter)
-sample_set   <- sample(combined_set, size = 10000, replace = TRUE)
+sample_set   <- sample(combined_set, size = 5000, replace = TRUE)
 
 # encode
 sample_set <- iconv(sample_set, "latin1", "ASCII", "") 
@@ -72,12 +74,12 @@ sample_set <- iconv(sample_set, "latin1", "ASCII", "")
 swiftkey = Corpus(VectorSource(sample_set))
 
 # clean up objects
-rm(blog, news, twitter, sample_set)
+rm(blog, news, twitter, sample_set, combined_set)
 ```
 
 Tidy up the data sets by removing elements and converting to a common case.
 
-```{r tidy, cache=TRUE}
+```{r tidy}
 swiftkey <- tm_map(swiftkey, content_transformer(tolower))
 
 # remove the most commonly used words in the english language
@@ -94,15 +96,14 @@ swiftkey <- tm_map(swiftkey, removeNumbers)
 
 ## Basic n-gram models
 
-```{r}
-###################
-## http://tm.r-forge.r-project.org/faq.html
-# https://www.jstatsoft.org/article/view/v025i05
+The final section deals with modeling n-grams and graphing the frequency of unigram, bigram, and trigram.
 
-ff <- TermDocumentMatrix(swiftkey)
-findFreqTerms(ff, lowfreq=100)
+For reference, see the following links
 
+* http://tm.r-forge.r-project.org/faq.html
+* https://www.jstatsoft.org/article/view/v025i05
 
+```{r ngram}
 unigram <- function(x) unlist(lapply(ngrams(words(x), 1), paste, collapse = " "), use.names = FALSE)
 bigram  <- function(x) unlist(lapply(ngrams(words(x), 2), paste, collapse = " "), use.names = FALSE)
 trigram <- function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " "), use.names = FALSE)
@@ -110,31 +111,45 @@ trigram <- function(x) unlist(lapply(ngrams(words(x), 3), paste, collapse = " ")
 tdm1 <- TermDocumentMatrix(swiftkey, control = list(tokenize = unigram))
 tdm2 <- TermDocumentMatrix(swiftkey, control = list(tokenize = bigram))
 tdm3 <- TermDocumentMatrix(swiftkey, control = list(tokenize = trigram))
+rm(swiftkey)
 
-inspect(tdm2[202:205, 1:5])
+freq1 <- sort(rowSums(as.matrix(tdm1)), decreasing = TRUE)[1:15]
+rm(tdm1)
 
-tt <- findFreqTerms(tdm1, lowfreq = 90)[1:25]
-findFreqTerms(tdm2, lowfreq = 7)[1:25]
-findFreqTerms(tdm3, lowfreq = 2)[1:25]
+freq2 <- sort(rowSums(as.matrix(tdm2)), decreasing = TRUE)[1:15]
+rm(tdm2)
 
-
-freq1 <- sort(rowSums(as.matrix(tdm1)), decreasing = TRUE)[1:25]
-freq2 <- sort(rowSums(as.matrix(tdm2)), decreasing = TRUE)[1:25]
-freq3 <- sort(rowSums(as.matrix(tdm3)), decreasing = TRUE)[1:25]
-freq1
-tt
-
-#findAssocs(tdm1, "will", 0.5)
-#findFreqTerms(tdm1, 200)
-
-tdm1
-
-tdm = removeSparseTerms(tdm1, 0.2)
-
-tdm
-
+freq3 <- sort(rowSums(as.matrix(tdm3)), decreasing = TRUE)[1:15]
+rm(tdm3)
 ```
 
+### Unigram
 
-## end with word cloud for fun
+```{r}
+x1 <- data.frame(shingles = names(freq1), fq = freq1)
+
+ggplot(x1, aes(x=reorder(shingles, fq), y=fq)) + 
+  geom_bar(stat="identity") + xlab("Term(s)") + ylab("Frequency") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+```
+
+### Bigram
+
+```{r}
+x2 <- data.frame(shingles = names(freq2), fq = freq2)
+
+ggplot(x2, aes(x=reorder(shingles, fq), y=fq)) + 
+  geom_bar(stat="identity") + xlab("Term(s)") + ylab("Frequency") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+```
+
+### Trigram
+
+```{r}
+x3 <- data.frame(shingles = names(freq3), fq = freq3)
+
+ggplot(x3, aes(x=reorder(shingles, fq), y=fq)) + 
+  geom_bar(stat="identity") + xlab("Term(s)") + ylab("Frequency") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+```
 
