@@ -65,7 +65,7 @@ Samples of the data sets are used to reduce the memory footprint.
 set.seed(90210)
 
 combined_set <- c(blog, news, twitter)
-sample_set   <- sample(combined_set, size = 7500, replace = TRUE)
+sample_set   <- sample(combined_set, size = 5000, replace = TRUE)
 
 # encode
 sample_set <- iconv(sample_set, "latin1", "ASCII", "") 
@@ -98,7 +98,7 @@ swiftkey <- tm_map(swiftkey, removeNumbers)
 
 The final section deals with modeling n-grams and graphing the frequency of unigram, bigram, and trigram.
 
-For reference, see the following links if you are interesting in learning more about text mining with R
+For reference, see the following links
 
 * http://tm.r-forge.r-project.org/faq.html
 * https://www.jstatsoft.org/article/view/v025i05
@@ -125,8 +125,6 @@ rm(tdm3)
 
 ### Unigram
 
-Unigrams ordered by frequency
-
 ```{r}
 x1 <- data.frame(shingles = names(freq1), fq = freq1)
 
@@ -136,8 +134,6 @@ ggplot(x1, aes(x=reorder(shingles, fq), y=fq)) +
 ```
 
 ### Bigram
-
-Bigrams ordered by frequency 
 
 ```{r}
 x2 <- data.frame(shingles = names(freq2), fq = freq2)
@@ -149,8 +145,6 @@ ggplot(x2, aes(x=reorder(shingles, fq), y=fq)) +
 
 ### Trigram
 
-Trigrams ordered by frequency
-
 ```{r}
 x3 <- data.frame(shingles = names(freq3), fq = freq3)
 
@@ -158,8 +152,4 @@ ggplot(x3, aes(x=reorder(shingles, fq), y=fq)) +
   geom_bar(stat="identity") + xlab("Term(s)") + ylab("Frequency") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
 ```
-
-## Conclusion and next steps
-
-This was a good first step towards the final goal of creating a prediction algorithm.  I can see some large hurdles, such as quality of the data and performance.  Not to mention choosing the overall methodology of the prediction.  As far as next steps go, I am going to continue to model/clean the data and look for ways to make it more useful.     
 
