@@ -1,13 +1,15 @@
 ## Securing the Data
-#setwd("~/GitHub/Capstone")
+setwd("~/GitHub/Capstone")
 
-PredictionModel <- function(phrase) {
+#load libraries
+library(tm)
   
-  #load libraries
-  library(tm)
-  
-  # predict results
-  result <- paste("cool: ", phrase)
-   
-  result
-}
+# load the model
+load("pridictionModel.rda")
+
+phrase <- "once upon a"
+
+# predict results
+result <- paste(ngram.bi[1,]$second, phrase)
+
+
