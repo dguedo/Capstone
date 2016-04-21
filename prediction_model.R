@@ -8,7 +8,7 @@ library(tm)
 load("pridictionModel.rda")
 
 # if(input == ''|input == "na na") return('Warning: Just input something')
-phrase <- "In a 1st Kingdom far a way, once upon a"
+phrase <- "once upon a"
 #phrase <- " with experimental results showing the"
 #phrase <- "Since then, something interesting has "
 #phrase <- "at the end of the"
@@ -24,7 +24,7 @@ phrase <- removeNumbers(phrase)
 # split into words and find the last 4
 phrase <- strsplit(phrase,split=" ")[[1]]
 
-if (length(phrase) > 3){
+if (length(phrase) >= 3){
   phrase  <- phrase[(length(phrase) - 2):length(phrase)]
   index <- 3
   w1 <- phrase[index-2]
