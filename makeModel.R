@@ -14,7 +14,7 @@ sampleSet <- function(){
   
   #combined_set <- c(blog, news, twitter)
   combined_set <- c(blog, news)
-  sample_set   <- sample(combined_set, size = 1000, replace = TRUE)
+  sample_set   <- sample(combined_set, size = 3000, replace = TRUE)
   
   # encode
   sample_set <- iconv(sample_set, "latin1", "ASCII", "") 
@@ -67,16 +67,21 @@ finalModel <- function(file_freq, n){
   names(fm)[1] <- "freq"
   fm$phrase <- row.names(fm)
   
-  fm$first  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][1])
+  
   if (n == 2){
-    fm$second  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][2])
+    fm$first  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][1])
+    fm$nextWord  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][2])
   } else if (n == 3){
+    fm$first  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][1])
     fm$second  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][2])
-    fm$third  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][3])
+    fm$nextWord  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][3])
   } else if (n == 4){
+    fm$first  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][1])
     fm$second  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][2])
     fm$third  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][3])
-    fm$fourth  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][4])
+    fm$nextWord  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][4])
+  } else {
+    fm$nextWord  <- lapply(fm$phrase, function(x) strsplit(x,split=" ")[[1]][1])
   }
 
   return(fm)
