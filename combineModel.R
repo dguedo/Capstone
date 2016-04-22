@@ -117,7 +117,7 @@ combineModels("data/combinedModel10.rda")
 load("data/combinedModel.rda")
 
 ngram.uni  <- c1[1:10,]
-ngram.bi   <- c2[c2$freq == 1,]
+ngram.bi   <- c2[c2$freq != 1,]
 ngram.tri  <- c3[c3$freq != 1,]
 ngram.four <- c4[c4$freq != 1,]
 
